@@ -1,6 +1,6 @@
 # lita-reddit
 
-TODO: Add a description of the plugin.
+A plugin that allows for watching the /new queue of a subreddit and posting new items to a chat room.
 
 ## Installation
 
@@ -12,11 +12,14 @@ gem "lita-reddit"
 
 ## Configuration
 
-TODO: Describe any configuration attributes the plugin exposes.
+config.handlers.reddit.reddits = [{subreddit: "subreddit_name", channel: "##channel_to_update"}]
+config.handlers.reddit.client_id = "client_from_api"
+config.handlers.reddit.client_secret = "secret_from_api"
+config.handlers.reddit.poll_interval = 300 #optional, default 300 (seconds)
 
 ## Usage
 
-TODO: Describe the plugin's features and how to use them.
+Add a collection of subreddit and channel pairs to the reddits array, create a script api key on reddit and enter those values, and then restart lita
 
 ## License
 
