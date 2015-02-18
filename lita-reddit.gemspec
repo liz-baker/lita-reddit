@@ -1,11 +1,11 @@
 Gem::Specification.new do |spec|
   spec.name          = "lita-reddit"
-  spec.version       = "0.0.1"
+  spec.version       = "0.0.5"
   spec.authors       = ["Chris Baker"]
   spec.email         = ["dosman711@gmail.com"]
-  spec.description   = %q{TODO: Add a description}
-  spec.summary       = %q{TODO: Add a summary}
-  spec.homepage      = "TODO: Add a homepage"
+  spec.description   = %q{A Reddit handler for Lita.}
+  spec.summary       = %q{A Reddit handler for the lita chat robot.}
+  spec.homepage      = "https://github.com/dosman711/lita-reddit"
   spec.license       = "MIT"
   spec.metadata      = { "lita_plugin_type" => "handler" }
 
