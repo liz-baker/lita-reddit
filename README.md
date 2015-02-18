@@ -12,10 +12,16 @@ gem "lita-reddit"
 
 ## Configuration
 
+```
+\# List of subreddit/channel to update pairs
 config.handlers.reddit.reddits = [{subreddit: "subreddit_name", channel: "##channel_to_update"}]
+\# The client ID from the Reddit API
 config.handlers.reddit.client_id = "client_from_api"
+\# The secret ID from the Reddit API
 config.handlers.reddit.client_secret = "secret_from_api"
-config.handlers.reddit.poll_interval = 300 #optional, default 300 (seconds)
+\# The delay to wait before starting the polling in seconds (optional, defaults to 30s)
+config.handlers.reddit.startup_delay = 30
+```
 
 ## Usage
 
