@@ -46,7 +46,7 @@ module Lita
         post_text = 'From /r/%s: %s (http://redd.it/%s)'
         base_redis_key = 'seen_list_%s_%s'
         config.reddits.each do |reddit|
-          log.debug ('updating posts for /r/%s' % [reddit[:subreddit]])
+          log.info('updating posts for /r/%s' % [reddit[:subreddit]])
           #new on the left
           redis_key = base_redis_key % [reddit[:channel], reddit[:subreddit]]
           post_limit = 3
@@ -59,10 +59,13 @@ module Lita
             req.params['limit'] = post_limit
             req.params['before'] = redis.lindex(redis_key, 0)
           end
-          log.debug('result of request %s' % [resp.status])
+          log.info('result of request %s' % [resp.status])
+          log.info(resp.body)
           response_body = MultiJson.load(resp.body)
+          results = response_body['data']['children']
+          log.info('count of results' % [results.length])
           target = Source.new(room: reddit[:channel])
-          response_body['data']['children'].reverse.each do |post|
+          results.reverse.each do |post|
             if !seen_reddits.include?(post['data']['id']) then
               robot.send_message(target, post_text % [post['data']['subreddit'], post['data']['title'], post['data']['id']])
               redis.lpush(redis_key, post['data']['id'])
