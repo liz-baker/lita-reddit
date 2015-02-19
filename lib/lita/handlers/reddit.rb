@@ -16,8 +16,8 @@ module Lita
 
 
       def setup(payload)
-        update_token
         after(config.startup_delay) do
+          update_token
           refresh_posts
         end
         every (config.poll_interval) do
