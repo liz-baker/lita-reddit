@@ -53,9 +53,10 @@ module Lita
           seen_reddits = redis.lrange(redis_key, 0, 10)
           request = http
           resp = request.get do |req|
-            req.url 'https://oauth.reddit.com/r/%s/new' % [reddit[:subreddit]]
+            req.url 'https://oauth.reddit.com/r/%s/new.json' % [reddit[:subreddit]]
             req.headers['Authorization'] = 'bearer %s' % [@@access_token]
             req.headers['User-Agent'] = @@user_agent
+            req.headers['Content-Type'] = 'Application/json'
             req.params['limit'] = post_limit
             req.params['before'] = redis.lindex(redis_key, 0)
           end
