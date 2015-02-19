@@ -21,6 +21,8 @@ config.handlers.reddit.client_id = "client_from_api"
 config.handlers.reddit.client_secret = "secret_from_api"
 # The delay to wait before starting the polling in seconds (optional, defaults to 30s)
 config.handlers.reddit.startup_delay = 30
+# The interval in between requests (optional, defaults to 300s)
+config.handlers.reddit.poll_interval = 300
 ```
 
 ## Usage

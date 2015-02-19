@@ -1,6 +1,3 @@
-require 'thread'
-require 'redd'
-
 module Lita
   module Handlers
     class Reddit < Handler
@@ -11,37 +8,68 @@ module Lita
         config :reddits, type: Array
       end
       config :startup_delay, type: Integer, default: 30
+      config :poll_interval, type: Integer, default: 300
 
       on :connected, :setup
 
+      @@user_agent = 'ruby:lita-reddit:v0.0.6 (by /u/dosman711)'
+
 
       def setup(payload)
+        update_token
         after(config.startup_delay) do
-          setup_streams
+          refresh_posts
+        end
+        every (config.poll_interval) do
+          refresh_posts
+        end
+        # update userless token once per hour
+        every (3300) do
+          update_token
         end
       end
 
-      def setup_streams
-        post_text = 'From /r/%s: %s (%s)'
+      def update_token
+        log.debug('updating userless oauth token')
+        request = http
+        request.basic_auth(config.client_id, config.client_secret)
+        auth_response = request.post do |req|
+          req.url 'https://www.reddit.com/api/v1/access_token'
+          req.headers['User-Agent'] = @@user_agent
+          req.body = 'grant_type=client_credentials'
+        end
+        response = MultiJson.load(auth_response.body)
+        @@access_token = response['access_token']
+      end
+
+      def refresh_posts
+        post_text = 'From /r/%s: %s (http://redd.it/%s)'
         base_redis_key = 'seen_list_%s_%s'
         config.reddits.each do |reddit|
-          Thread.new {
-            #new on the left
-            redis_key = base_redis_key % [reddit[:channel], reddit[:subreddit]]
-            post_limit = 3
-            seen_reddits = redis.lrange(redis_key, 0, post_limit - 1)
-            userless = Redd.it(:userless, config.client_id, config.client_secret, user_agent: 'lita-reddit/1.0')
-            Lita.logger.debug('setting up stream for %s' % [reddit[:subreddit]])
-            target = Source.new(room: reddit[:channel])
-            userless.stream :get_new, reddit[:subreddit], limit: post_limit do |post|
-              if !seen_reddits.include?(post.fullname) then
-                robot.send_message(target, post_text % [post.subreddit, post.title, post.short_url])
-                redis.lpush(redis_key, post.fullname)
-              end
-              redis.ltrim(redis_key, 0, post_limit - 1)
+          log.debug ('updating posts for /r/%s' % [reddit[:subreddit]])
+          #new on the left
+          redis_key = base_redis_key % [reddit[:channel], reddit[:subreddit]]
+          post_limit = 3
+          seen_reddits = redis.lrange(redis_key, 0, 10)
+          request = http
+          resp = request.get do |req|
+            req.url 'https://oauth.reddit.com/r/%s/new' % [reddit[:subreddit]]
+            req.headers['Authorization'] = 'bearer %s' % [@@access_token]
+            req.headers['User-Agent'] = @@user_agent
+            req.params['limit'] = post_limit
+            req.params['before'] = redis.lindex(redis_key, 0)
+          end
+          log.debug('result of request %s' % [resp.status])
+          response_body = MultiJson.load(resp.body)
+          target = Source.new(room: reddit[:channel])
+          response_body['data']['children'].reverse.each do |post|
+            if !seen_reddits.include?(post['data']['id']) then
+              robot.send_message(target, post_text % [post['data']['subreddit'], post['data']['title'], post['data']['id']])
+              redis.lpush(redis_key, post['data']['id'])
             end
-          }
-          Lita.logger.debug('finished setting up stream for %s' % [reddit[:subreddit]])
+            # keep a few extra around, 10 is still instantaneous
+            redis.ltrim(redis_key, 0, 10)
+          end
         end
       end 
     end
