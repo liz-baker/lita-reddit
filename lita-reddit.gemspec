@@ -1,6 +1,6 @@
 Gem::Specification.new do |spec|
   spec.name          = "lita-reddit"
-  spec.version       = "0.0.6"
+  spec.version       = "0.0.7"
   spec.authors       = ["Chris Baker"]
   spec.email         = ["dosman711@gmail.com"]
   spec.description   = %q{A Reddit handler for Lita.}

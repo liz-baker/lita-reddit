@@ -12,8 +12,7 @@ module Lita
 
       on :connected, :setup
 
-      @@user_agent = 'ruby:lita-reddit:v0.0.6 (by /u/dosman711)'
-
+      @@user_agent = 'ruby:lita-reddit:v0.0.7 (by /u/dosman711)'
 
       def setup(payload)
         after(config.startup_delay) do
@@ -30,7 +29,7 @@ module Lita
       end
 
       def update_token
-        log.debug('updating userless oauth token')
+        log.debug('lita-reddit: updating userless oauth token')
         request = http
         request.basic_auth(config.client_id, config.client_secret)
         auth_response = request.post do |req|
@@ -46,7 +45,7 @@ module Lita
         post_text = 'From /r/%s: %s (http://redd.it/%s)'
         base_redis_key = 'seen_list_%s_%s'
         config.reddits.each do |reddit|
-          log.info('updating posts for /r/%s' % [reddit[:subreddit]])
+          log.debug('lita-reddit: updating posts for /r/%s' % [reddit[:subreddit]])
           #new on the left
           redis_key = base_redis_key % [reddit[:channel], reddit[:subreddit]]
           post_limit = 3
@@ -60,11 +59,9 @@ module Lita
             req.params['limit'] = post_limit
             req.params['before'] = redis.lindex(redis_key, 0)
           end
-          log.info('result of request %s' % [resp.status])
-          log.info(resp.body)
+          log.debug('lita-reddit: HTTP result of request %s' % [resp.status])
           response_body = MultiJson.load(resp.body)
           results = response_body['data']['children']
-          log.info('count of results' % [results.length])
           target = Source.new(room: reddit[:channel])
           results.reverse.each do |post|
             if !seen_reddits.include?(post['data']['id']) then
