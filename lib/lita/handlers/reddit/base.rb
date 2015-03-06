@@ -3,7 +3,7 @@ require 'api_calls'
 module Lita
   module Handlers
     class Reddit < Handler
-      class Base < Reddit
+      class Base < Handler
         namespace 'reddit'
 
         def reddits

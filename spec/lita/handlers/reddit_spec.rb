@@ -1,9 +1,8 @@
 require "spec_helper"
 
-describe Lita::Handlers::Reddit::SubredditPoster, lita_handler: true do
+describe Lita::Handlers::Reddit::SubredditPoster, lita_handler: true, base_handlers:[Lita::Handlers::Reddit] do
   it 'outputs new posts to the specified channels' do
-    require "pry"; binding.pry
-    registry.config.handlers.reddit.tap do |config|
+    Lita.config.handlers.reddit.tap do |config|
       config.client_id = "clientId"
       config.client_secret = "clientSecret"
       config.reddits = [{subreddit:"test", channel:"test"}]
@@ -26,3 +25,4 @@ describe Lita::Handlers::Reddit::SubredditPoster, lita_handler: true do
     expect(replies.count).to be 1
   end
 end
+
