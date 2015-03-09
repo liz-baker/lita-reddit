@@ -6,20 +6,8 @@ module Lita
       class Base < Handler
         namespace 'reddit'
 
-        def reddits
-          config.reddits
-        end
-
-        def startup_delay
-          config.startup_delay
-        end
-
-        def poll_interval
-          config.poll_interval
-        end
-        
-        def post_limit
-          config.post_limit
+        def client_id
+          config.client_id
         end
 
         def client

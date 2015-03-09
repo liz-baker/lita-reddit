@@ -1,11 +1,11 @@
 require "spec_helper"
 
-describe Lita::Handlers::Reddit::SubredditPoster, lita_handler: true, base_handlers:[Lita::Handlers::Reddit] do
+describe Lita::Handlers::Reddit::SubredditPoster, lita_handler: true, additional_lita_handlers: Lita::Handlers::Reddit do
   it 'outputs new posts to the specified channels' do
-    Lita.config.handlers.reddit.tap do |config|
+    registry.config.handlers.reddit.tap do |config|
       config.client_id = "clientId"
       config.client_secret = "clientSecret"
-      config.reddits = [{subreddit:"test", channel:"test"}]
+      config.subreddit_poster.reddits = [{subreddit:"test", channel:"test"}]
     end
     allow(subject.client).to receive(:get_posts).and_return([{id: "post_id", subreddit: "test", title: "title"}])
     robot.trigger(:reddit_refresh_posts)
@@ -16,7 +16,7 @@ describe Lita::Handlers::Reddit::SubredditPoster, lita_handler: true, base_handl
     registry.config.handlers.reddit.tap do |config|
       config.client_id = "clientId"
       config.client_secret = "clientSecret"
-      config.reddits = [{subreddit:"test", channel:"test"}]
+      config.subreddit_poster.reddits = [{subreddit:"test", channel:"test"}]
     end
     allow(subject.client).to receive(:get_posts).and_return([{id: "post_id", subreddit: "test", title: "title"}])
     robot.trigger(:reddit_refresh_posts)

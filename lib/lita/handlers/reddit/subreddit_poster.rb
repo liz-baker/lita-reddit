@@ -3,6 +3,21 @@ module Lita
     class Reddit < Handler
       class SubredditPoster < Base
         namespace 'reddit'
+        def reddits
+          config.subreddit_poster.reddits
+        end
+
+        def startup_delay
+          config.subreddit_poster.startup_delay
+        end
+
+        def poll_interval
+          config.subreddit_poster.poll_interval
+        end
+        
+        def post_limit
+          config.subreddit_poster.post_limit
+        end
         on :connected, :setup
         on :reddit_update_token, :update_token
         on :reddit_refresh_posts, :refresh_posts
