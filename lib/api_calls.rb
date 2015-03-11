@@ -8,7 +8,7 @@ class ApiCalls
     'ruby:lita-reddit:v0.0.7 (by /u/dosman711)'
   end
 
-  def update_token(request)
+  def update_token(request) 
     request.basic_auth(@client_id, @client_secret)
     auth_response = request.post do |req|
       req.url 'https://www.reddit.com/api/v1/access_token'
@@ -17,6 +17,8 @@ class ApiCalls
     end
     response = MultiJson.load(auth_response.body)
     @access_token = response['access_token']
+  rescue
+   nil 
   end
 
   def get_posts(request, subreddit, redis_key)
@@ -36,5 +38,7 @@ class ApiCalls
         subreddit: r['data']['subreddit'], 
         title: r['data']['title']
       }}
+  rescue
+    return []
   end
 end
