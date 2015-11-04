@@ -52,4 +52,20 @@ describe Lita::Handlers::Reddit::SubredditPoster,
     allow(subject.client).to receive(:update_token).and_raise(RuntimeError)
     expect { subject.update_token(nil) }.not_to raise_error
   end
+
+  it "unescapes escaped html text" do
+    response = [{
+      id: "post_id",
+      subreddit: "test",
+      title: "This &amp; that, these &amp; those",
+      user: "user",
+      shortlink: "http://redd.it/post_id"
+    }]
+    registry.config.handlers.reddit.tap do |config|
+      config.reddits = [{ subreddit: "test", channel: "test" }]
+    end
+    allow(subject.client).to receive(:get_posts).and_return(response)
+    robot.trigger(:reddit_refresh_posts)
+    expect(replies.last).to eq("/u/user: This & that, these & those | /r/test | http://redd.it/post_id")
+  end
 end
