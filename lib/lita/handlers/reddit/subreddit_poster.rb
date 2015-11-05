@@ -40,7 +40,7 @@ module Lita
                                        post_limit)
             results.reverse.each do |post|
               unless seen_reddits.include?(post[:id])
-                robot.send_message(target, post_text % post)
+                robot.send_message(target, CGI::unescapeHTML(post_text % post))
                 redis.lpush(redis_key, post[:id])
               end
 
