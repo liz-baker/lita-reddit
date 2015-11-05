@@ -15,6 +15,7 @@ describe Lita::Handlers::Reddit::SubredditPoster,
         user: "user",
         shortlink: "http://redd.it/post_id"
       }]
+    allow(described_class).to receive(:new).and_return(subject)
   end
   it "outputs new posts to the specified channels" do
     registry.config.handlers.reddit.tap do |config|
